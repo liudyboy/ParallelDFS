@@ -24,7 +24,9 @@ local_n :   进程内所包含的边的数目
 3. path sequence search
 各个进程基于`<start_edge, end_edge, len>`三元组，进行路径序列的搜索。
 
-
+Example 3:
 ![example3](./imgs/example3.png)
 
+
+Example 4:
 ![example4](./imgs/example4.png)

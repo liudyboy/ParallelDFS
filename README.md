@@ -25,6 +25,6 @@ local_n :   进程内所包含的边的数目
 各个进程基于`<start_edge, end_edge, len>`三元组，进行路径序列的搜索。
 
 
-![https://github.com/liudyboy/ParallelDFS/tree/main/imgs/example3.PNG]()
+![example3](https://github.com/liudyboy/ParallelDFS/tree/main/imgs/example3.png)
 
-![](https://github.com/liudyboy/ParallelDFS/tree/main/imgs/example4.PNG)
+![example4](https://github.com/liudyboy/ParallelDFS/tree/main/imgs/example4.png)

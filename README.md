@@ -27,4 +27,4 @@ local_n :   进程内所包含的边的数目
 
 ![example3](./imgs/example3.png)
 
-![example4](https://github.com/liudyboy/ParallelDFS/tree/main/imgs/example4.png)
+![example4](./imgs/example4.png)

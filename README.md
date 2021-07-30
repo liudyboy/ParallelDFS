@@ -23,3 +23,8 @@ local_n :   进程内所包含的边的数目
 
 3. path sequence search
 各个进程基于`<start_edge, end_edge, len>`三元组，进行路径序列的搜索。
+
+
+![](https://github.com/liudyboy/ParallelDFS/tree/main/imgs/example3.PNG)
+
+![](https://github.com/liudyboy/ParallelDFS/tree/main/imgs/example4.PNG)

@@ -24,11 +24,18 @@ local_n :   进程内所包含的边的数目
 3. path sequence search
 各个进程基于`<start_edge, end_edge, len>`三元组，进行路径序列的搜索。
 
-Example 3:
+Example 3: circle exit among processes
 
 ![example3](./imgs/example3.png)
 
++ P0: 0 1 2
++ P1: 3 4 5
++ P2: 6 7 8 9
 
-Example 4:
+
+Example 4: circle exit in a process
 
 ![example4](./imgs/example4.png)
+
++ P0: 0 1 2 3 4
++ P1: 5 6 7 8 9

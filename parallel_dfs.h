@@ -4,7 +4,7 @@
  * @Email: deyin.liu@nscc-gz.cn
  * @Date: 2021-07-27 17:06:04
  * @LastEditors: liudy
- * @LastEditTime: 2021-07-30 16:00:02
+ * @LastEditTime: 2021-08-05 10:26:17
  */
 /*
  * @Brief: file description
@@ -20,10 +20,26 @@
 
 #include "mpi.h"
 
+#define TOPK 3
 
 using std::vector;
 using std::string;
 
+class ParallelStream{
+  public:
+  ParallelStream(string file_name_prefix = "./paths/path_");
+  ~ParallelStream();
+  void CreateFile(unsigned long path_id);
+  void OpenFile(unsigned long path_id);
+  void SetPrefix(string prefix);
+  void CloseFile();
+  void ParallelWrite(vector<unsigned long>& data, unsigned long offset);
+  void SequenceRead(unsigned long path_id);
+  private:
+  string file_name_prefix_;
+  MPI_File fh_;
+  unsigned long num_files_; 
+};
 
 class ParallelDFS {
  public:
@@ -70,60 +86,46 @@ class ParallelDFS {
                           unsigned long cur_edge, unsigned long cur_len,
                           vector<unsigned long>& path_seq);
 
-  void SinglePathSeqSearch(int master_process,
-                           vector<unsigned long>& global_path,
-                           vector<unsigned long>& path_seq);
-
+void SinglePathSeqSearch(vector<unsigned long>& global_path);
   /**
    * @brief: According to the global path to get the path sequence. 
    */
-  void PathSeqSearch(int master_process,
-                     vector<vector<unsigned long> >& global_paths,
-                     vector<vector<unsigned long> >& global_path_seq);
+void PathSeqSearch(int master_process,
+                                vector<vector<unsigned long> >& global_paths);
 
-  /**
-   * @brief: Search in local paths to find paths that start from the local
-   * start edge
-   * @param local_paths [in]
-   * @param  local_start_edge [in]
-   * @param  local_end_edges [out] The local end edges of paths
-   * @param  paths_len [out] The length of paths
-   * @return
-   */
-  void QueryLocalPath(vector<unsigned long>& local_paths,
-                      unsigned long local_start_edge,
-                      vector<unsigned long>& local_end_edges,
-                      vector<unsigned long>& paths_len);
+/**
+ * @brief: Search in local paths to find paths that start from the local
+ * start edge
+ * @param local_paths [in]
+ * @param  local_start_edge [in]
+ * @param  local_end_edges [out] The local end edges of paths
+ * @param  paths_len [out] The length of paths
+ * @return
+ */
+void QueryLocalPath(vector<unsigned long>& local_paths,
+                    unsigned long local_start_edge,
+                    vector<unsigned long>& local_end_edges,
+                    vector<unsigned long>& paths_len);
 
-  void GlobalDFS(MPI_Win& win, unsigned long cur_end_edge,
-                 vector<unsigned long>& single_global_path,
-                 vector<vector<unsigned long> >& global_paths);
-  void GlobalPathSearch(MPI_Win& win,
-                        vector<vector<unsigned long> >& global_paths,
-                        vector<unsigned long>& local_paths);
+void GlobalDFS(MPI_Win& win, unsigned long cur_end_edge,
+               vector<unsigned long>& single_global_path,
+               vector<vector<unsigned long> >& global_paths);
+void GlobalPathSearch(MPI_Win& win,
+                      vector<vector<unsigned long> >& global_paths,
+                      vector<unsigned long>& local_paths);
 
-  /**
-   * @brief: Send a signal to other processes, tell them job is finish, stop to
-   * wait for receiving message.
-   * @param master_process
-   */
-  void SendStopSignal(int master_process);
+void ResetLocalVisitedMap();
+void ResetGlobalVisitedMap();
+void SaveToFile(vector<vector<unsigned long> >& path_seq,
+                string file_name = "Path.csv");
 
-  void SendQueryToRemote(int master_process,
-                         vector<unsigned long>& global_path);
 
-  void GetAnswerFromRemote(int master_process,
-                           vector<unsigned long>& global_path,
-                           vector<unsigned long>& path_seq);
-
-  void WaitForQuerying(int master_process);
-  void ResetLocalVisitedMap();
-  void ResetGlobalVisitedMap();
-  void SaveToFile(vector<vector<unsigned long> >&  path_seq, string file_name = "Path.csv");
-  vector<unsigned long> local_edges_;
-  bool local_path_seq_complete_;  // Used in LocalPathSeqSearch function to
-                                 // indicate the lcoal path sequence search is
-                                 // completed
-  vector<bool> local_visited_map_;
-  vector<bool> global_visited_map_;
+vector<unsigned long> local_edges_;
+bool local_path_seq_complete_;  // Used in LocalPathSeqSearch function to
+                                // indicate the lcoal path sequence search
+                                // is completed
+vector<bool> local_visited_map_;
+vector<bool> global_visited_map_;
+ParallelStream path_output_;
+unsigned long top_k_;    // only save top K path according to the length.
 };

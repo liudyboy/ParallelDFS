@@ -18,8 +18,9 @@ local_n :   进程内所包含的边的数目
 
 全局搜索路径表示
 ```
-[global_start_edge, end_edge, local_path, end_edge, local_path, .....,  global_end_edge, local_path]
+[global_start_edge, end_edge, path_length, end_edge, path_length, .....,  global_end_edge, path_length]
 ```
+其中的path_length 表示的是当前路径已有的长度。
 
 3. path sequence search
 各个进程基于`<start_edge, end_edge, len>`三元组，进行路径序列的搜索。

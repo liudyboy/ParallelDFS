@@ -41,6 +41,7 @@ class ParallelStream {
 class ParallelDFS {
  public:
   void run();
+  void SetMaxLength(unsigned long max_len = -1);
 
  private:
   void GetNextEdge(unsigned long edge, vector<unsigned long>& next_edges);
@@ -69,15 +70,6 @@ class ParallelDFS {
   void LocalPathSearch(vector<unsigned long>& local_paths);
   void GetPathFromRemote(int target_process, unsigned long target_edge,
                          vector<unsigned long>& remote_path, MPI_Win& win);
-
-  /**
-   * @brief: Collect the global paths
-   * @param  master_process The global paths is collected in master porcess.
-   * @param global_paths The global paths search in each process.
-   * @return {*}
-   */
-  void CollectGlobalPath(int master_process,
-                         vector<vector<unsigned long> >& global_paths);
 
   void LocalPathSeqSearch(vector<unsigned long>& query_msg,
                           unsigned long cur_edge, unsigned long cur_len,
@@ -125,4 +117,6 @@ class ParallelDFS {
   vector<bool> global_visited_map_;
   ParallelStream path_output_;
   unsigned long top_k_;  // only save top K path according to the length.
+  unsigned long path_id_;
+  unsigned long max_path_len_;
 };

@@ -26,7 +26,6 @@ const unsigned long kGlobalEndEdge = -1;
 const unsigned long kStopSignal = -2;
 
 
-
 // Test example 1
 
 // void ParallelDFS::GetNextEdge(unsigned long edge, vector<unsigned long>& next_edges) {
@@ -193,98 +192,18 @@ const unsigned long kStopSignal = -2;
 // }
 
 // example 3  (circle exit among processes)
-void ParallelDFS::GetNextEdge(unsigned long edge, vector<unsigned long>& next_edges) {
-  map<unsigned long, vector<unsigned long> > graph;
-  vector<unsigned long> children0{6, 7};
-  vector<unsigned long> children1{4, 9};
-  vector<unsigned long> children2{1};
-  vector<unsigned long> children3{1};
-  vector<unsigned long> children4;
-  vector<unsigned long> children5;
-  vector<unsigned long> children6{1};
-  vector<unsigned long> children7 {3, 5};
-  vector<unsigned long> children8{3, 5};
-  vector<unsigned long> children9{3, 5};
-
-  graph[0] = children0;
-  graph[1] = children1;
-  graph[2] = children2;
-  graph[3] = children3;
-  graph[4] = children4;
-  graph[5] = children5;
-  graph[6] = children6;
-  graph[7] = children7;
-  graph[8] = children8;
-  graph[9] = children9;
-
-  next_edges = graph[edge];
-}
-
-void ParallelDFS::GetLocalEdges(vector<unsigned long>& local_edges) {
-  int my_id, process_num;
-  MPI_Comm_rank(MPI_COMM_WORLD, &my_id);
-  MPI_Comm_size(MPI_COMM_WORLD, &process_num);
-  unsigned long start, end;
-  if (my_id == 0) {
-    start = 0;
-    end = 2;
-  }
-  if (my_id == 1) {
-    start = 3;
-    end = 5;
-  }
-
-  if (my_id == 2) {
-    start = 6;
-    end = 9;
-  }
-  local_edges.push_back(start);
-  local_edges.push_back(end);
-}
-
-bool ParallelDFS::CheckGlobalStartEdge(unsigned long edge) {
-  if (edge == 0 || edge == 2 || edge == 8) return true;
-  return false;
-}
-
-int ParallelDFS::GetEdgeOwner(unsigned long edge) {
-  if (edge >= 0 && edge < 3)
-    return 0;
-  else if (edge >= 3 && edge < 6)
-    return 1;
-  else
-    return 2;
-}
-
-unsigned long ParallelDFS::GetRemoteLocalId(unsigned long edge) {
-  if (edge >= 0 && edge < 3)
-    return edge;
-  else if (edge >= 3 && edge < 6)
-    return edge - 3;
-  else
-    return edge - 6;
-}
-
-unsigned long ParallelDFS::GetRemoteLocalN(int target_process) {
-  if (target_process == 0) return 3;
-  if (target_process == 1) return 3;
-  return 4;
-}
-
-
-// example 4 (circle exit in one porcess)
 // void ParallelDFS::GetNextEdge(unsigned long edge, vector<unsigned long>& next_edges) {
 //   map<unsigned long, vector<unsigned long> > graph;
-//   vector<unsigned long> children0{1};
-//   vector<unsigned long> children1{2, 4};
-//   vector<unsigned long> children2{3, 9};
+//   vector<unsigned long> children0{6, 7};
+//   vector<unsigned long> children1{4, 9};
+//   vector<unsigned long> children2{1};
 //   vector<unsigned long> children3{1};
 //   vector<unsigned long> children4;
-//   vector<unsigned long> children5{1};
-//   vector<unsigned long> children6{5, 7};
-//   vector<unsigned long> children7 {3, 9};
-//   vector<unsigned long> children8{3, 9};
-//   vector<unsigned long> children9;
+//   vector<unsigned long> children5;
+//   vector<unsigned long> children6{1};
+//   vector<unsigned long> children7 {3, 5};
+//   vector<unsigned long> children8{3, 5};
+//   vector<unsigned long> children9{3, 5};
 
 //   graph[0] = children0;
 //   graph[1] = children1;
@@ -307,38 +226,116 @@ unsigned long ParallelDFS::GetRemoteLocalN(int target_process) {
 //   unsigned long start, end;
 //   if (my_id == 0) {
 //     start = 0;
-//     end = 5;
+//     end = 2;
 //   }
 //   if (my_id == 1) {
-//     start = 5;
-//     end = 10;
+//     start = 3;
+//     end = 5;
 //   }
 
-//   for (size_t i = start; i < end; i++) {
-//     local_edges.push_back(i);
+//   if (my_id == 2) {
+//     start = 6;
+//     end = 9;
 //   }
+//   local_edges.push_back(start);
+//   local_edges.push_back(end);
 // }
 
 // bool ParallelDFS::CheckGlobalStartEdge(unsigned long edge) {
-//   if (edge == 0 || edge == 6 || edge == 8) return true;
+//   if (edge == 0 || edge == 2 || edge == 8) return true;
 //   return false;
 // }
 
 // int ParallelDFS::GetEdgeOwner(unsigned long edge) {
-//   if (edge >= 0 && edge < 5)
+//   if (edge >= 0 && edge < 3)
 //     return 0;
-//   return 1;
+//   else if (edge >= 3 && edge < 6)
+//     return 1;
+//   else
+//     return 2;
 // }
 
 // unsigned long ParallelDFS::GetRemoteLocalId(unsigned long edge) {
-//   if (edge >= 0 && edge < 5)
+//   if (edge >= 0 && edge < 3)
 //     return edge;
-//   return edge - 5;
+//   else if (edge >= 3 && edge < 6)
+//     return edge - 3;
+//   else
+//     return edge - 6;
 // }
 
 // unsigned long ParallelDFS::GetRemoteLocalN(int target_process) {
-//   return 5;
+//   if (target_process == 0) return 3;
+//   if (target_process == 1) return 3;
+//   return 4;
 // }
+
+
+// example 4 (circle exit in one porcess)
+void ParallelDFS::GetNextEdge(unsigned long edge, vector<unsigned long>& next_edges) {
+  map<unsigned long, vector<unsigned long> > graph;
+  vector<unsigned long> children0{1};
+  vector<unsigned long> children1{2, 4};
+  vector<unsigned long> children2{3, 9};
+  vector<unsigned long> children3{1};
+  vector<unsigned long> children4;
+  vector<unsigned long> children5{1};
+  vector<unsigned long> children6{5, 7};
+  vector<unsigned long> children7 {3, 9};
+  vector<unsigned long> children8{3, 9};
+  vector<unsigned long> children9;
+
+  graph[0] = children0;
+  graph[1] = children1;
+  graph[2] = children2;
+  graph[3] = children3;
+  graph[4] = children4;
+  graph[5] = children5;
+  graph[6] = children6;
+  graph[7] = children7;
+  graph[8] = children8;
+  graph[9] = children9;
+
+  next_edges = graph[edge];
+}
+
+void ParallelDFS::GetLocalEdges(vector<unsigned long>& local_edges) {
+  int my_id, process_num;
+  MPI_Comm_rank(MPI_COMM_WORLD, &my_id);
+  MPI_Comm_size(MPI_COMM_WORLD, &process_num);
+  unsigned long start, end;
+  if (my_id == 0) {
+    start = 0;
+    end = 4;
+  }
+  if (my_id == 1) {
+    start = 5;
+    end = 9;
+  }
+  local_edges.push_back(start);
+  local_edges.push_back(end);
+}
+
+bool ParallelDFS::CheckGlobalStartEdge(unsigned long edge) {
+  if (edge == 0 || edge == 6 || edge == 8) return true;
+  return false;
+}
+
+int ParallelDFS::GetEdgeOwner(unsigned long edge) {
+  if (edge >= 0 && edge < 5)
+    return 0;
+  return 1;
+}
+
+unsigned long ParallelDFS::GetRemoteLocalId(unsigned long edge) {
+  if (edge >= 0 && edge < 5)
+    return edge;
+  return edge - 5;
+}
+
+unsigned long ParallelDFS::GetRemoteLocalN(int target_process) {
+  return 5;
+}
 
 
 
@@ -453,6 +450,9 @@ void ParallelDFS::GetPathFromRemote(int target_process, unsigned long target_edg
 void ParallelDFS::GlobalDFS(MPI_Win& win, unsigned long cur_end_edge,
                             vector<unsigned long>& single_global_path,
                             vector<vector<unsigned long> >& global_paths) {
+
+  if (single_global_path.back() > max_path_len_) // 防止路径长度异常一直在增加,确保能退出
+    return;
   if (cur_end_edge == kGlobalEndEdge) {
     global_paths.push_back(single_global_path);
     return;
@@ -465,28 +465,14 @@ void ParallelDFS::GlobalDFS(MPI_Win& win, unsigned long cur_end_edge,
   vector<unsigned long> remote_path;
   GetPathFromRemote(target_process, cur_end_edge, remote_path, win);
 
-
-  for (size_t i = 0; i < remote_path.size(); i+=2) {
-    if (remote_path[i] != kGlobalEndEdge) {
-      // if (global_visited_map_[remote_path[i]]) continue;
-      // global_visited_map_[remote_path[i]] = true;
-      unsigned long cur_len = single_global_path.back();
-      single_global_path.push_back(remote_path[i]);
-      single_global_path.push_back(remote_path[i + 1] + cur_len);
-      GlobalDFS(win, remote_path[i], single_global_path, global_paths);
-      single_global_path.pop_back();
-      single_global_path.pop_back();
-      // global_visited_map_[remote_path[i]] = false;
-    } else {
-      unsigned long cur_len = single_global_path.back();
-      single_global_path.push_back(remote_path[i]);
-      single_global_path.push_back(remote_path[i + 1] + cur_len);
-      GlobalDFS(win, remote_path[i], single_global_path, global_paths);
-      single_global_path.pop_back();
-      single_global_path.pop_back();
-    }
+  for (size_t i = 0; i < remote_path.size(); i += 2) {
+    unsigned long cur_len = single_global_path.back();
+    single_global_path.push_back(remote_path[i]);
+    single_global_path.push_back(remote_path[i + 1] + cur_len);
+    GlobalDFS(win, remote_path[i], single_global_path, global_paths);
+    single_global_path.pop_back();
+    single_global_path.pop_back();
   }
-
   global_visited_map_[cur_end_edge] = false;
 }
 
@@ -514,104 +500,6 @@ void ParallelDFS::GlobalPathSearch(MPI_Win& win,
   }
 }
 
-void ParallelDFS::CollectGlobalPath(int master_process, vector<vector<unsigned long> >& global_paths) {
-  int my_id, num_process;
-  MPI_Comm_rank(MPI_COMM_WORLD, &my_id);
-  MPI_Comm_size(MPI_COMM_WORLD, &num_process);
-  unsigned long num_local_paths = global_paths.size();
-  vector<unsigned long> num_paths;
-  if (my_id == master_process) num_paths.resize(num_process);
-  MPI_Gather(&num_local_paths, 1, MPI_UNSIGNED_LONG, num_paths.data(), 1,
-             MPI_UNSIGNED_LONG, master_process, MPI_COMM_WORLD);
-
-  // master collect path size message
-  vector<vector<unsigned long> > paths_size;
-  MPI_Request* request = new MPI_Request[num_process];
-  MPI_Status* status = new MPI_Status[num_process];
-
-  for (size_t i = 0; i < num_process; i++)
-    request[i] = MPI_REQUEST_NULL;
-
-  if (my_id == master_process) {
-    for (int send_process = 0; send_process < num_process; send_process++) {
-      vector<unsigned long> tmp;
-      paths_size.push_back(tmp);
-      paths_size[send_process].resize(num_paths[send_process]);
-      if (send_process != master_process) {
-        MPI_Irecv(paths_size[send_process].data(), num_paths[send_process],
-                  MPI_UNSIGNED_LONG, send_process, send_process, MPI_COMM_WORLD,
-                  &request[send_process]);
-      }
-    }
-  } else {
-      vector<unsigned long> paths_msg_len;
-      paths_msg_len.resize(num_local_paths);
-      for (size_t i = 0; i < num_local_paths; i++) {
-        paths_msg_len[i] = global_paths[i].size();
-      }
-      MPI_Send(paths_msg_len.data(), num_local_paths,
-               MPI_UNSIGNED_LONG, master_process, my_id, MPI_COMM_WORLD);
-  }
-
-  MPI_Waitall(num_process, request, status);
-  MPI_Barrier(MPI_COMM_WORLD);
-  delete []request;
-  delete []status;
-
-  // if (my_id == master_process) {
-  //   cout << "============ paths size =================" << endl;
-  //   for (size_t i = 0; i < paths_size.size(); i++) {
-  //     cout << "process # " << i << endl;
-  //     for (size_t j = 0; j < paths_size[i].size(); j++) {
-  //       cout << paths_size[i][j] << " ";
-  //     }
-  //     cout << endl;
-  //   }
-  // }
-
-  unsigned long comm_times = 0; // master communication times
-  if (my_id == master_process) {
-    for (size_t i = 0; i < num_process; i++) {
-      if (i != master_process) comm_times += num_paths[i];
-    }
-  }
-  MPI_Bcast(&comm_times, 1, MPI_UNSIGNED_LONG, master_process, MPI_COMM_WORLD);
-  // cout << "comm_times = " << comm_times << endl;
-  request = new MPI_Request[comm_times];
-  status = new MPI_Status[comm_times];
-  for (size_t i = 0; i < num_process; i++)
-    request[i] = MPI_REQUEST_NULL;
-
-  // master collect path message
-  if (my_id == master_process) {
-    int msg_size;
-    unsigned long comm_count = 0;
-    for (int send_process = 0; send_process < num_process; send_process++) {
-      if (send_process != master_process) {
-        for (size_t i = 0; i < num_paths[send_process]; i++) {
-          vector<unsigned long> single_path;
-          global_paths.push_back(single_path);
-          msg_size = paths_size[send_process][i];
-          global_paths.back().resize(msg_size);
-          MPI_Irecv(global_paths.back().data(), msg_size, MPI_UNSIGNED_LONG,
-                   send_process, i, MPI_COMM_WORLD,
-                   &request[comm_count]);
-          comm_count++;
-        }
-      }
-    }
-  } else {
-    for (size_t i = 0; i < global_paths.size(); i++) {
-      MPI_Send(global_paths[i].data(), global_paths[i].size(),
-               MPI_UNSIGNED_LONG, master_process, i, MPI_COMM_WORLD);
-    }
-  }
-  MPI_Waitall(num_process, request, status);
-  MPI_Barrier(MPI_COMM_WORLD);
-  delete []request;
-  delete []status;
-
-}
 
 void ParallelDFS::LocalPathSeqSearch(vector<unsigned long>& query_msg,
                                      unsigned long cur_edge,
@@ -689,7 +577,6 @@ void ParallelDFS::SinglePathSeqSearch(unsigned long* global_path, unsigned long 
     }
     start_edge = global_path[i];
     pre_len = global_path[i + 1];
-
   }
 }
 
@@ -706,6 +593,7 @@ void ParallelDFS::PathSeqSearch(int master_process,
 
   unsigned long num_files = 0;
   unsigned long lengths[NUM_FILE];
+
   for (size_t i = 0; i < num_paths; i += NUM_FILE) {
     num_files = num_paths - i > NUM_FILE ?  NUM_FILE : num_paths - i;
 
@@ -732,17 +620,25 @@ void ParallelDFS::PathSeqSearch(int master_process,
     }
     MPI_Bcast(batch_path, total_size, MPI_UNSIGNED_LONG, master_process, MPI_COMM_WORLD);
 
-    path_output_.CreateFiles(i, num_files);
+    path_output_.CreateFiles(path_id_, num_files);
     unsigned long offset = 0;
     for (size_t j = 0; j < num_files; j++) {
-      SinglePathSeqSearch(batch_path + offset, lengths[j], i + j);
+      SinglePathSeqSearch(batch_path + offset, lengths[j], path_id_ + j);
       offset += lengths[j];
     }
     path_output_.CloseFiles();
+    path_id_ += num_files;
     delete[] batch_path;
   }
 }
+
+void ParallelDFS::SetMaxLength(unsigned long max_len) {
+  max_path_len_ = max_len;
+}
+
 void ParallelDFS::run() {
+  // initialize variables
+  path_id_ = 0;
   top_k_ = TOPK;
 
   int my_id, process_num;
@@ -755,34 +651,26 @@ void ParallelDFS::run() {
   LocalPathSearch(local_paths);
 
   ResetGlobalVisitedMap();
+
   MPI_Win win;
   MPI_Win_create(local_paths.data(), sizeof(unsigned long) * local_paths.size(),
                  sizeof(unsigned long), MPI_INFO_NULL, MPI_COMM_WORLD, &win);
   GlobalPathSearch(win, global_paths, local_paths);
+  MPI_Win_free(&win);  // free window
 
-  CollectGlobalPath(master_process, global_paths);
+  vector<unsigned long>().swap(local_paths); // free memory
 
-  // if (my_id == master_process) {
-  //   for (size_t i = 0; i < global_paths.size(); i++) {
-  //     for (size_t j = 0; j < global_paths[i].size(); j++) {
-  //       cout << global_paths[i][j] << " ";
-  //     }
-  //     cout << endl;
-  //   }
-  // }
+  for (int token = 0; token < process_num; token++) {
+    PathSeqSearch(token, global_paths);
+  }
 
-  PathSeqSearch(master_process, global_paths);
 
-  unsigned long num_paths;
-  if (my_id == master_process) num_paths = global_paths.size();
-  MPI_Bcast(&num_paths, 1, MPI_UNSIGNED_LONG, 0, MPI_COMM_WORLD);
-  cout << "num_paths = " << num_paths << endl;
-  for (size_t i = 0; i < num_paths; i++) {
+  // print path result
+  for (size_t i = 0; i < path_id_; i++) {
     path_output_.OpenFile(i);
     if (my_id == master_process) path_output_.SequenceRead(i);
     path_output_.CloseFile();
   }
-  MPI_Win_free(&win);  // free window
 }
 
 

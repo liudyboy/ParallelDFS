@@ -1,7 +1,7 @@
 # ParallelDFS
 Deep first search (DFS) parallel implementatoin based on MPI.
 
-每个进程上会执行两个线程，一个线程作为server,一个作为client。server用于响应client对于下一条边是什么的查询。
+每个进程上会执行两个线程，一个线程作为server,一个作为client。server用于响应client对于下一条边是什么的查询。其这次实现可适用于单节点可用内存很小的情况，因为在查询路径的时候，采用了只保存一定长度的路径即进行数据的写入文件的策略。
 
 ## Example 3: circle exit among processes
 

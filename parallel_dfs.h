@@ -47,7 +47,7 @@ class PathFile {
   ofstream fout;
   unsigned long* data_;
   unsigned long count_;
-  unsigned short path_count_;
+  unsigned long path_count_;
 };
 
 class PathMsg {
@@ -67,6 +67,7 @@ class PathMsg {
 class LocalMsg {
  public:
   LocalMsg();
+  ~LocalMsg();
   LocalMsg(const unsigned long path_id, const unsigned long start_edge, const unsigned long hash_value);
   void Link(LocalMsg* msg);
   unsigned long Query(const unsigned long path_id, const unsigned start_edge,
@@ -83,6 +84,7 @@ class LocalMsg {
 class ParallelDFS {
  public:
   ParallelDFS();
+  ~ParallelDFS();
   void run();
   void Server();
   void SetOutDir(string address);

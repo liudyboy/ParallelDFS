@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
   int provided;
   MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
   ParallelDFS parallel_dfs;
-  parallel_dfs.SetOutDir("path2/");
+  // parallel_dfs.SetOutDir("path2/");
   parallel_dfs.run();
   MPI_Finalize();
   return 0;

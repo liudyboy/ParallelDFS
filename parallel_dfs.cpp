@@ -280,7 +280,18 @@ const unsigned long Seed = 2021;
 void ParallelDFS::GetNextEdges(unsigned long edge,
                                vector<unsigned long>& next_edges) {
   map<unsigned long, vector<unsigned long> > graph;
-  vector<unsigned long> children0{1};
+  // vector<unsigned long> children0{1};
+  // vector<unsigned long> children1{2, 4};
+  // vector<unsigned long> children2{3, 9};
+  // vector<unsigned long> children3{1};
+  // vector<unsigned long> children4;
+  // vector<unsigned long> children5{1};
+  // vector<unsigned long> children6{5, 7};
+  // vector<unsigned long> children7{3, 9};
+  // vector<unsigned long> children8{3, 9};
+  // vector<unsigned long> children9;
+
+  vector<unsigned long> children0;
   vector<unsigned long> children1{2, 4};
   vector<unsigned long> children2{3, 9};
   vector<unsigned long> children3{1};
@@ -336,6 +347,9 @@ ParallelDFS::ParallelDFS() {
   output_dir_ = "paths/";
 }
 
+ParallelDFS::~ParallelDFS() {
+}
+
 
 void ParallelDFS::SetOutDir(string address) {
   output_dir_ = address;
@@ -365,8 +379,8 @@ unsigned long ParallelDFS::QueryNextEdge(const unsigned long edge,
                                          PathMsg& path_msg,
                                          unsigned long* fork_edge,
                                          unsigned long& hash_value) {
-  unsigned long query_msg[6]{edge,         path_msg.Data(0), path_msg.Data(1),
-                             fork_edge[0], fork_edge[1],     hash_value};
+  unsigned long query_msg[6]{edge, path_msg.Data(0), path_msg.Data(1),
+                             fork_edge[0], fork_edge[1], hash_value};
   int owner = GetEdgeOwner(edge);
   MPI_Send(query_msg, 6, MPI_UNSIGNED_LONG, owner, 0, MPI_COMM_WORLD);
 
@@ -391,8 +405,16 @@ void ParallelDFS::Server() {
     if (next_edges_[local_id].size() == 0) {
       GetNextEdges(msg[0], next_edges_[local_id]);
     }
-    unsigned long next_edge =
-        SearchNextEdge(msg[0], msg[1], msg[2], msg[3], msg[4], msg[5]);
+    unsigned long next_edge;
+    if (next_edges_[local_id].size() == 0) {
+      if (msg[2] == msg[0])
+        next_edge = kSearchEnd;
+      else
+        next_edge = kGlobalEndEdge;
+    } else {
+      next_edge =
+          SearchNextEdge(msg[0], msg[1], msg[2], msg[3], msg[4], msg[5]);
+    }
     answer[0] = next_edge;
     answer[1] = msg[4];  // next_fork
     answer[2] = msg[5];  // hash_value
@@ -482,14 +504,6 @@ void ParallelDFS::run() {
 
   delete[] local_msg_;
   delete[] next_edges_;
-  // PathFile file_output;
-  // for (unsigned long i = 1; i < 50; i++) {
-  //   if (i % 10 == 0)
-  //     file_output.NewPath();
-  //   if (i == 20)
-  //     file_output.RemovePath();
-  //   file_output.Output(i);
-  // }
 }
 
 /****************** PathMsg class *******************************/
@@ -544,7 +558,6 @@ PathFile::~PathFile() {
 }
 
 void PathFile::CreateDir() {
-  cout << file_name_ << endl;
   int my_id;
   MPI_Comm_rank(MPI_COMM_WORLD, &my_id);
   string dir = file_name_ + to_string(my_id);
@@ -558,6 +571,7 @@ void PathFile::CreateFile() {
   string file_name = file_name_ + to_string(my_id) + "/path_" +
                      to_string(path_count_) + ".csv";
   fout.open(file_name, ios::out | ios::app);
+  cout << "create file " << file_name << endl;
 }
 
 void PathFile::Output(unsigned long data) {
@@ -596,6 +610,7 @@ void PathFile::RemovePath() {
                      to_string(path_count_) + ".csv";
   remove(file_name.c_str());
   path_count_--;
+  cout << "remove file " << file_name << endl;
 }
 
 void PathFile::Clear() { count_ = 0; }
@@ -615,6 +630,10 @@ LocalMsg::LocalMsg(const unsigned long path_id, const unsigned long start_edge,
       count_(0),
       next_(nullptr) {}
 
+LocalMsg::~LocalMsg() {
+  if (next_ != nullptr)
+    delete next_;
+}
 void LocalMsg::Link(LocalMsg* msg) {
   msg->next_ = next_;
   next_ = msg;
